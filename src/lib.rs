@@ -325,7 +325,7 @@ mod image_tests {
     fn test_annex_i_qr_as_image() {
         let code = QrCode::new(b"01234567").unwrap();
         let image = code.render::<Luma<u8>>().build();
-        let expected = load_from_memory(include_bytes!("test_annex_i_qr_as_image.png")).unwrap().to_luma8();
+        let expected = load_from_memory(include_bytes!("../tests/test_annex_i_qr_as_image.png")).unwrap().to_luma8();
         assert_eq!(image.dimensions(), expected.dimensions());
         assert_eq!(image.into_raw(), expected.into_raw());
     }
@@ -339,7 +339,8 @@ mod image_tests {
             .dark_color(Rgb([128, 0, 0]))
             .light_color(Rgb([255, 255, 128]))
             .build();
-        let expected = load_from_memory(include_bytes!("test_annex_i_micro_qr_as_image.png")).unwrap().to_rgb8();
+        let expected =
+            load_from_memory(include_bytes!("../tests/test_annex_i_micro_qr_as_image.png")).unwrap().to_rgb8();
         assert_eq!(image.dimensions(), expected.dimensions());
         assert_eq!(image.into_raw(), expected.into_raw());
     }
@@ -354,7 +355,7 @@ mod svg_tests {
     fn test_annex_i_qr_as_svg() {
         let code = QrCode::new(b"01234567").unwrap();
         let image = code.render::<SvgColor>().build();
-        let expected = include_str!("test_annex_i_qr_as_svg.svg");
+        let expected = include_str!("../tests/test_annex_i_qr_as_svg.svg");
         assert_eq!(&image, expected);
     }
 
@@ -367,7 +368,7 @@ mod svg_tests {
             .dark_color(SvgColor("#800000"))
             .light_color(SvgColor("#ffff80"))
             .build();
-        let expected = include_str!("test_annex_i_micro_qr_as_svg.svg");
+        let expected = include_str!("../tests/test_annex_i_micro_qr_as_svg.svg");
         assert_eq!(&image, expected);
     }
 }
