@@ -287,10 +287,12 @@ impl PartialOrd for Mode {
     /// a superset of all characters supported by `a`.
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
         match (*self, *other) {
-            (Mode::Numeric, Mode::Alphanumeric | Mode::Byte) |
-(Mode::Alphanumeric | Mode::Kanji, Mode::Byte) => Some(Ordering::Less),
-            (Mode::Alphanumeric | Mode::Byte, Mode::Numeric) |
-(Mode::Byte, Mode::Alphanumeric | Mode::Kanji) => Some(Ordering::Greater),
+            (Mode::Numeric, Mode::Alphanumeric | Mode::Byte) | (Mode::Alphanumeric | Mode::Kanji, Mode::Byte) => {
+                Some(Ordering::Less)
+            }
+            (Mode::Alphanumeric | Mode::Byte, Mode::Numeric) | (Mode::Byte, Mode::Alphanumeric | Mode::Kanji) => {
+                Some(Ordering::Greater)
+            }
             (a, b) if a == b => Some(Ordering::Equal),
             _ => None,
         }
