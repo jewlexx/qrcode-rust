@@ -27,7 +27,7 @@
 //! ```
 
 #![cfg_attr(feature = "bench", feature(test, external_doc))] // Unstable libraries
-#![deny(warnings, clippy::pedantic)]
+#![warn(warnings, clippy::pedantic)]
 #![allow(
     clippy::must_use_candidate, // This is just annoying.
     clippy::use_self, // Rust 1.33 doesn't support Self::EnumVariant, let's try again in 1.37.

@@ -15,11 +15,11 @@ impl Truncate for u16 {
 }
 
 pub trait As {
-    fn as_u16(self) -> u16;
-    fn as_i16(self) -> i16;
-    fn as_u32(self) -> u32;
-    fn as_usize(self) -> usize;
-    fn as_isize(self) -> isize;
+    fn as_u16(&self) -> u16;
+    fn as_i16(&self) -> i16;
+    fn as_u32(&self) -> u32;
+    fn as_usize(&self) -> usize;
+    fn as_isize(&self) -> isize;
 }
 
 trait ExpectOrOverflow {
@@ -39,45 +39,25 @@ impl<T> ExpectOrOverflow for Option<T> {
 
 macro_rules! impl_as {
     ($ty:ty) => {
-        #[cfg(debug_assertions)]
         impl As for $ty {
-            fn as_u16(self) -> u16 {
+            fn as_u16(&self) -> u16 {
                 self.as_u16_checked().expect_or_overflow(self, "u16")
             }
 
-            fn as_i16(self) -> i16 {
+            fn as_i16(&self) -> i16 {
                 self.as_i16_checked().expect_or_overflow(self, "i16")
             }
 
-            fn as_u32(self) -> u32 {
+            fn as_u32(&self) -> u32 {
                 self.as_u32_checked().expect_or_overflow(self, "u32")
             }
 
-            fn as_usize(self) -> usize {
+            fn as_usize(&self) -> usize {
                 self.as_usize_checked().expect_or_overflow(self, "usize")
             }
 
-            fn as_isize(self) -> isize {
+            fn as_isize(&self) -> isize {
                 self.as_isize_checked().expect_or_overflow(self, "usize")
-            }
-        }
-
-        #[cfg(not(debug_assertions))]
-        impl As for $ty {
-            fn as_u16(self) -> u16 {
-                self as u16
-            }
-            fn as_i16(self) -> i16 {
-                self as i16
-            }
-            fn as_u32(self) -> u32 {
-                self as u32
-            }
-            fn as_usize(self) -> usize {
-                self as usize
-            }
-            fn as_isize(self) -> isize {
-                self as isize
             }
         }
     };

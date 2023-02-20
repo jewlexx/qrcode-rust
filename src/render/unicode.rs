@@ -121,7 +121,7 @@ fn integration_render_utf8_1x2() {
             + "  ▀███▄ ▀▀ █ ██  \n"
             + "  ▀▀▀ ▀ ▀▀ ▀  ▀  \n"
             + "                 "
-    )
+    );
 }
 
 #[test]

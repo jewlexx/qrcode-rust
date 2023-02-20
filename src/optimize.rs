@@ -131,42 +131,42 @@ impl<'a> Iterator for Parser<'a> {
         }
 
         loop {
-            let (i, ecs) = match self.ecs_iter.next() {
-                None => return None,
-                Some(a) => a,
-            };
-            let (next_state, action) = STATE_TRANSITION[self.state as usize + ecs as usize];
-            self.state = next_state;
+            if let Some((i, ecs)) = self.ecs_iter.next() {
+                let (next_state, action) = STATE_TRANSITION[self.state as usize + ecs as usize];
+                self.state = next_state;
 
-            let old_begin = self.begin;
-            let push_mode = match action {
-                Action::Idle => continue,
-                Action::Numeric => Mode::Numeric,
-                Action::Alpha => Mode::Alphanumeric,
-                Action::Byte => Mode::Byte,
-                Action::Kanji => Mode::Kanji,
-                Action::KanjiAndSingleByte => {
-                    let next_begin = i - 1;
-                    if self.begin == next_begin {
-                        Mode::Byte
-                    } else {
-                        self.pending_single_byte = true;
-                        self.begin = next_begin;
-                        return Some(Segment {
-                            mode: Mode::Kanji,
-                            begin: old_begin,
-                            end: next_begin,
-                        });
+                let old_begin = self.begin;
+                let push_mode = match action {
+                    Action::Idle => continue,
+                    Action::Numeric => Mode::Numeric,
+                    Action::Alpha => Mode::Alphanumeric,
+                    Action::Byte => Mode::Byte,
+                    Action::Kanji => Mode::Kanji,
+                    Action::KanjiAndSingleByte => {
+                        let next_begin = i - 1;
+                        if self.begin == next_begin {
+                            Mode::Byte
+                        } else {
+                            self.pending_single_byte = true;
+                            self.begin = next_begin;
+                            return Some(Segment {
+                                mode: Mode::Kanji,
+                                begin: old_begin,
+                                end: next_begin,
+                            });
+                        }
                     }
-                }
-            };
+                };
 
-            self.begin = i;
-            return Some(Segment {
-                mode: push_mode,
-                begin: old_begin,
-                end: i,
-            });
+                self.begin = i;
+                return Some(Segment {
+                    mode: push_mode,
+                    begin: old_begin,
+                    end: i,
+                });
+            }
+
+            return None;
         }
     }
 }
@@ -467,10 +467,12 @@ mod optimize_tests {
     use crate::optimize::{total_encoded_len, Optimizer, Segment};
     use crate::types::{Mode, Version};
 
-    fn test_optimization_result(given: Vec<Segment>, expected: Vec<Segment>, version: Version) {
-        let prev_len = total_encoded_len(&given, version);
+    fn test_optimization_result(given: &[Segment], expected: &[Segment], version: Version) {
+        let prev_len = total_encoded_len(given, version);
         let opt_segs = Optimizer::new(given.iter().copied(), version).collect::<Vec<_>>();
         let new_len = total_encoded_len(&opt_segs, version);
+        // Not supported by rust-analyzer https://github.com/rust-lang/rust-clippy/issues/10087
+        #[allow(clippy::uninlined_format_args)]
         if given != opt_segs {
             assert!(prev_len > new_len, "{} > {}", prev_len, new_len);
         }
@@ -478,7 +480,7 @@ mod optimize_tests {
             opt_segs == expected,
             "Optimization gave something better: {} < {} ({:?})",
             new_len,
-            total_encoded_len(&expected, version),
+            total_encoded_len(expected, version),
             opt_segs
         );
     }
@@ -486,7 +488,7 @@ mod optimize_tests {
     #[test]
     fn test_example_1() {
         test_optimization_result(
-            vec![
+            &[
                 Segment {
                     mode: Mode::Alphanumeric,
                     begin: 0,
@@ -503,7 +505,7 @@ mod optimize_tests {
                     end: 10,
                 },
             ],
-            vec![
+            &[
                 Segment {
                     mode: Mode::Alphanumeric,
                     begin: 0,
@@ -522,7 +524,7 @@ mod optimize_tests {
     #[test]
     fn test_example_2() {
         test_optimization_result(
-            vec![
+            &[
                 Segment {
                     mode: Mode::Numeric,
                     begin: 0,
@@ -549,7 +551,7 @@ mod optimize_tests {
                     end: 38,
                 },
             ],
-            vec![
+            &[
                 Segment {
                     mode: Mode::Numeric,
                     begin: 0,
@@ -568,7 +570,7 @@ mod optimize_tests {
     #[test]
     fn test_example_3() {
         test_optimization_result(
-            vec![
+            &[
                 Segment {
                     mode: Mode::Kanji,
                     begin: 0,
@@ -590,7 +592,7 @@ mod optimize_tests {
                     end: 8,
                 },
             ],
-            vec![Segment {
+            &[Segment {
                 mode: Mode::Byte,
                 begin: 0,
                 end: 8,
@@ -602,7 +604,7 @@ mod optimize_tests {
     #[test]
     fn test_example_4() {
         test_optimization_result(
-            vec![
+            &[
                 Segment {
                     mode: Mode::Kanji,
                     begin: 0,
@@ -614,7 +616,7 @@ mod optimize_tests {
                     end: 11,
                 },
             ],
-            vec![
+            &[
                 Segment {
                     mode: Mode::Kanji,
                     begin: 0,
@@ -633,7 +635,7 @@ mod optimize_tests {
     #[test]
     fn test_annex_j_guideline_1a() {
         test_optimization_result(
-            vec![
+            &[
                 Segment {
                     mode: Mode::Numeric,
                     begin: 0,
@@ -645,7 +647,7 @@ mod optimize_tests {
                     end: 4,
                 },
             ],
-            vec![
+            &[
                 Segment {
                     mode: Mode::Numeric,
                     begin: 0,
@@ -664,7 +666,7 @@ mod optimize_tests {
     #[test]
     fn test_annex_j_guideline_1b() {
         test_optimization_result(
-            vec![
+            &[
                 Segment {
                     mode: Mode::Numeric,
                     begin: 0,
@@ -676,7 +678,7 @@ mod optimize_tests {
                     end: 4,
                 },
             ],
-            vec![Segment {
+            &[Segment {
                 mode: Mode::Alphanumeric,
                 begin: 0,
                 end: 4,
@@ -688,7 +690,7 @@ mod optimize_tests {
     #[test]
     fn test_annex_j_guideline_1c() {
         test_optimization_result(
-            vec![
+            &[
                 Segment {
                     mode: Mode::Numeric,
                     begin: 0,
@@ -700,7 +702,7 @@ mod optimize_tests {
                     end: 4,
                 },
             ],
-            vec![Segment {
+            &[Segment {
                 mode: Mode::Alphanumeric,
                 begin: 0,
                 end: 4,

@@ -173,7 +173,7 @@ impl Version {
     pub fn mode_bits_count(self) -> usize {
         match self {
             Version::Micro(a) => (a - 1).as_usize(),
-            _ => 4,
+            Version::Normal(_) => 4,
         }
     }
 
@@ -194,20 +194,28 @@ impl Version {
 #[derive(Debug, PartialEq, Eq, Copy, Clone)]
 pub enum Mode {
     /// The data contains only characters 0 to 9.
-    Numeric,
+    Numeric = 0,
 
     /// The data contains only uppercase letters (A–Z), numbers (0–9) and a few
     /// punctuations marks (space, `$`, `%`, `*`, `+`, `-`, `.`, `/`, `:`).
-    Alphanumeric,
-
-    /// The data contains arbitrary binary data.
-    Byte,
+    Alphanumeric = 1,
 
     /// The data contains Shift-JIS-encoded double-byte text.
-    Kanji,
+    Kanji = 2,
+
+    /// The data contains arbitrary binary data.
+    Byte = 3,
 }
 
 impl Mode {
+    const fn get_disc(self) -> u8 {
+        match self {
+            Mode::Numeric => 0,
+            Mode::Alphanumeric | Mode::Kanji => 1,
+            Mode::Byte => 2,
+        }
+    }
+
     /// Computes the number of bits needed to encode the data length.
     ///
     ///     use rqcode::types::{Version, Mode};
@@ -273,6 +281,7 @@ impl Mode {
     ///     assert!(a <= c);
     ///     assert!(b <= c);
     ///
+    #[must_use]
     pub fn max(self, other: Self) -> Self {
         match self.partial_cmp(&other) {
             Some(Ordering::Less | Ordering::Equal) => other,
@@ -286,14 +295,13 @@ impl PartialOrd for Mode {
     /// Defines a partial ordering between modes. If `a <= b`, then `b` contains
     /// a superset of all characters supported by `a`.
     fn partial_cmp(&self, other: &Self) -> Option<Ordering> {
-        match (*self, *other) {
-            (Mode::Numeric, Mode::Alphanumeric | Mode::Byte)
-            | (Mode::Alphanumeric | Mode::Kanji, Mode::Byte) => Some(Ordering::Less),
-            (Mode::Alphanumeric | Mode::Byte, Mode::Numeric)
-            | (Mode::Byte, Mode::Alphanumeric | Mode::Kanji) => Some(Ordering::Greater),
-            (a, b) if a == b => Some(Ordering::Equal),
-            _ => None,
-        }
+        Some(self.cmp(other))
+    }
+}
+
+impl Ord for Mode {
+    fn cmp(&self, other: &Self) -> Ordering {
+        self.get_disc().cmp(&other.get_disc())
     }
 }
 
@@ -305,8 +313,8 @@ mod mode_tests {
     fn test_mode_order() {
         assert!(Numeric < Alphanumeric);
         assert!(Byte > Kanji);
-        assert!(!(Numeric < Kanji));
-        assert!(!(Numeric >= Kanji));
+        assert!(Numeric >= Kanji);
+        assert!(Numeric < Kanji);
     }
 
     #[test]

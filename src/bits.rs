@@ -798,7 +798,7 @@ impl Bits {
     pub fn push_terminator(&mut self, ec_level: EcLevel) -> QrResult<()> {
         let terminator_size = match self.version {
             Version::Micro(a) => a.as_usize() * 2 + 1,
-            _ => 4,
+            Version::Normal(_) => 4,
         };
 
         let cur_length = self.len();

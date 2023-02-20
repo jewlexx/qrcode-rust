@@ -57,6 +57,7 @@ impl Module {
     ///     assert_eq!(Module::Masked(Color::Dark).mask(true), Module::Masked(Color::Dark));
     ///     assert_eq!(Module::Masked(Color::Dark).mask(false), Module::Masked(Color::Dark));
     ///
+    #[must_use]
     pub fn mask(self, should_invert: bool) -> Self {
         match (self, should_invert) {
             (Module::Empty, true) => Module::Masked(Color::Dark),
@@ -105,6 +106,7 @@ impl Canvas {
     #[cfg(test)]
     fn to_debug_str(&self) -> String {
         let width = self.width;
+        #[allow(clippy::cast_sign_loss)]
         let mut res = String::with_capacity((width * (width + 1)) as usize);
         for y in 0..width {
             res.push('\n');
@@ -1451,10 +1453,10 @@ impl Canvas {
 
     /// Draws the encoded data and error correction codes to the empty modules.
     pub fn draw_data(&mut self, data: &[u8], ec: &[u8]) {
-        let is_half_codeword_at_end = match (self.version, self.ec_level) {
-            (Version::Micro(1), EcLevel::L) | (Version::Micro(3), EcLevel::M) => true,
-            _ => false,
-        };
+        let is_half_codeword_at_end = matches!(
+            (self.version, self.ec_level),
+            (Version::Micro(1), EcLevel::L) | (Version::Micro(3), EcLevel::M)
+        );
 
         let mut coords = DataModuleIter::new(self.version);
         self.draw_codewords(data, is_half_codeword_at_end, &mut coords);
@@ -2038,6 +2040,7 @@ mod penalty_tests {
         ];
 
         let mut c = Canvas::new(Version::Micro(4), EcLevel::Q);
+        #[allow(clippy::cast_sign_loss)]
         for i in 0_i16..17 {
             c.put(i, -1, HORIZONTAL_SIDE[i as usize]);
             c.put(-1, i, VERTICAL_SIDE[i as usize]);
@@ -2072,6 +2075,7 @@ static ALL_PATTERNS_MICRO_QR: [MaskPattern; 4] = [
 impl Canvas {
     /// Construct a new canvas and apply the best masking that gives the lowest
     /// penalty score.
+    #[must_use]
     pub fn apply_best_mask(&self) -> Self {
         match self.version {
             Version::Normal(_) => ALL_PATTERNS_QR.iter(),
