@@ -1,5 +1,5 @@
 use image::Luma;
-use qrcode::QrCode;
+use rqcode::QrCode;
 
 fn main() {
     // Encode some data into bits.

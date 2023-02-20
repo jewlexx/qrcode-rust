@@ -29,7 +29,7 @@ Example
 ## Image generation
 
 ```rust
-use qrcode::QrCode;
+use rqcode::QrCode;
 use image::Luma;
 
 fn main() {
@@ -51,7 +51,7 @@ Generates this image:
 ## String generation
 
 ```rust
-use qrcode::QrCode;
+use rqcode::QrCode;
 
 fn main() {
     let code = QrCode::new(b"Hello").unwrap();
@@ -92,8 +92,8 @@ Generates this output:
 ## SVG generation
 
 ```rust
-use qrcode::{QrCode, Version, EcLevel};
-use qrcode::render::svg;
+use rqcode::{QrCode, Version, EcLevel};
+use rqcode::render::svg;
 
 fn main() {
     let code = QrCode::with_version(b"01234567", Version::Micro(2), EcLevel::L).unwrap();
@@ -113,8 +113,8 @@ Generates this SVG:
 ## Unicode string generation
 
 ```rust
-use qrcode::QrCode;
-use qrcode::render::unicode;
+use rqcode::QrCode;
+use rqcode::render::unicode;
 
 fn main() {
     let code = QrCode::new("mow mow").unwrap();

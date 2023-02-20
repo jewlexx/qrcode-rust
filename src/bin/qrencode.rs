@@ -2,7 +2,7 @@ use std::env;
 
 pub fn main() {
     let arg = env::args().nth(1).unwrap();
-    let code = qrcode::QrCode::new(arg.as_bytes()).unwrap();
+    let code = rqcode::QrCode::new(arg.as_bytes()).unwrap();
 
     print!(
         "{}",

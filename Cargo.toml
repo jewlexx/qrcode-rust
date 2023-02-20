@@ -1,24 +1,12 @@
 [package]
-name = "qrcode"
+name = "rqcode"
 description = "QR code encoder in Rust"
 license = "MIT OR Apache-2.0"
 version = "0.12.0"
 edition = "2018"
-authors = ["kennytm <kennytm@gmail.com>"]
+authors = ["Juliette Cordor", "kennytm <kennytm@gmail.com>"]
 keywords = ["qrcode"]
-repository = "https://github.com/kennytm/qrcode-rust"
-readme = "README.md"
-documentation = "http://docs.rs/qrcode"
-exclude = [
-    ".travis.yml", ".gitignore", "test-data/**"
-]
-
-[badges]
-travis-ci = { repository = "kennytm/qrcode-rust" }
-coveralls = { repository = "kennytm/qrcode-rust" }
-is-it-maintained-issue-resolution = { repository = "kennytm/qrcode-rust" }
-is-it-maintained-open-issues = { repository = "kennytm/qrcode-rust" }
-maintenance = { status = "passively-maintained" }
+repository = "https://github.com/jewlexx/qrcode-rust"
 
 [dependencies]
 image = { version = "0.24", default-features = false, optional = true }

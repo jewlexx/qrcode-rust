@@ -234,8 +234,8 @@ impl Bits {
     ///
     ///     #![allow(unused_must_use)]
     ///
-    ///     use qrcode::bits::Bits;
-    ///     use qrcode::types::Version;
+    ///     use rqcode::bits::Bits;
+    ///     use rqcode::types::Version;
     ///
     ///     let mut bits = Bits::new(Version::Normal(1));
     ///     bits.push_eci_designator(9); // 9 = ISO-8859-7 (Greek).
@@ -681,8 +681,8 @@ impl Bits {
     ///
     ///     #![allow(unused_must_use)]
     ///
-    ///     use qrcode::bits::Bits;
-    ///     use qrcode::types::Version;
+    ///     use rqcode::bits::Bits;
+    ///     use rqcode::types::Version;
     ///
     ///     let mut bits = Bits::new(Version::Normal(1));
     ///     bits.push_fnc1_first_position();
@@ -705,8 +705,8 @@ impl Bits {
     ///
     ///     #![allow(unused_must_use)]
     ///
-    ///     use qrcode::bits::Bits;
-    ///     use qrcode::types::Version;
+    ///     use rqcode::bits::Bits;
+    ///     use rqcode::types::Version;
     ///
     ///     let mut bits = Bits::new(Version::Normal(1));
     ///     bits.push_fnc1_second_position(37);
