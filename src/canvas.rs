@@ -223,9 +223,9 @@ impl Canvas {
                     y + j,
                     #[allow(clippy::match_same_arms)]
                     match (i, j) {
-                        (4, _) | (_, 4) | (-4, _) | (_, -4) => Color::Light,
-                        (3, _) | (_, 3) | (-3, _) | (_, -3) => Color::Dark,
-                        (2, _) | (_, 2) | (-2, _) | (_, -2) => Color::Light,
+                        (4 | -4, _) | (_, 4 | -4) => Color::Light,
+                        (3 | -3, _) | (_, 3 | -3) => Color::Dark,
+                        (2 | -2, _) | (_, 2 | -2) => Color::Light,
                         _ => Color::Dark,
                     },
                 );
@@ -325,7 +325,7 @@ impl Canvas {
                     x + i,
                     y + j,
                     match (i, j) {
-                        (2, _) | (_, 2) | (-2, _) | (_, -2) | (0, 0) => Color::Dark,
+                        (2 | -2, _) | (_, 2 | -2) | (0, 0) => Color::Dark,
                         _ => Color::Light,
                     },
                 );
@@ -693,7 +693,7 @@ mod draw_version_info_tests {
     #[test]
     fn test_draw_number() {
         let mut c = Canvas::new(Version::Micro(1), EcLevel::L);
-        c.draw_number(0b10101101, 8, Color::Dark, Color::Light, &[(0, 0), (0, -1), (-2, -2), (-2, 0)]);
+        c.draw_number(0b1010_1101, 8, Color::Dark, Color::Light, &[(0, 0), (0, -1), (-2, -2), (-2, 0)]);
         assert_eq!(
             &*c.to_debug_str(),
             "\n\
@@ -992,7 +992,7 @@ pub fn is_functional(version: Version, width: i16, x: i16, y: i16) -> bool {
                 true
             } else if a == 1 {
                 false
-            } else if 2 <= a && a <= 6 {
+            } else if (2..=6).contains(&a) {
                 (width - 7 - x).abs() <= 2 && (width - 7 - y).abs() <= 2
             } else {
                 let positions = ALIGNMENT_PATTERN_POSITIONS[(a - 7).as_usize()];
@@ -1364,7 +1364,7 @@ impl Canvas {
             let bits_end = if i == last_word { 4 } else { 0 };
             'outside: for j in (bits_end..=7).rev() {
                 let color = if (*b & (1 << j)) == 0 { Color::Light } else { Color::Dark };
-                while let Some((x, y)) = coords.next() {
+                for (x, y) in coords.by_ref() {
                     let r = self.get_mut(x, y);
                     if *r == Module::Empty {
                         *r = Module::Unmasked(color);
@@ -1766,7 +1766,7 @@ impl Canvas {
                     Box::new(|k| self.get(i, k).into())
                 };
 
-                if (j..(j + 7)).map(&*get).ne(PATTERN.iter().cloned()) {
+                if (j..(j + 7)).map(&*get).ne(PATTERN.iter().copied()) {
                     continue;
                 }
 

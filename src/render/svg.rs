@@ -66,7 +66,7 @@ impl<'a> RenderCanvas for Canvas<'a> {
     }
 
     fn draw_dark_rect(&mut self, left: u32, top: u32, width: u32, height: u32) {
-        write!(self.svg, "M{l} {t}h{w}v{h}H{l}V{t}", l = left, t = top, w = width, h = height).unwrap();
+        write!(self.svg, "M{left} {top}h{width}v{height}H{left}V{top}").unwrap();
     }
 
     fn into_image(mut self) -> String {
